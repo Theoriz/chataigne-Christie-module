@@ -1,0 +1,52 @@
+{
+	"name":"Christie",
+	"type":"TCP Client",
+	"path":"Hardware",
+	
+	"version":"0.0.2",
+	"description":"Control Christie projectors",
+	"url":"https://github.com/Theoriz/Christie-chataigne-module",
+	"downloadURL":"https://github.com/Theoriz/Christie-chataigne-module/archive/master.zip",
+	
+	"hideDefaultCommands":true,
+	"hideDefaultParameters": ["Protocol", "AutoAdd", "MessageStructure", "FirstValueIsTheName", "ReceiveFrequency"],
+
+	"parameters":
+	{
+		"Serie":
+		{
+			"type":"Enum",
+			"options":
+			{
+				"dummy":"dummyToRemoveWarning"
+			},
+		},
+	},
+
+	"defaults":
+	{		
+		"Output":
+		{
+			"Local":false,
+			"remotePort":3002
+		},
+	},
+
+	"scripts":
+	[
+		"Christie.js"
+	],
+
+	"values":
+	{
+
+	},
+
+	"commands":
+	{
+		"Power on":"power on",
+		"Power off":"power off",
+		"Shutter on/off":"shutter on_off",
+	},
+
+}
