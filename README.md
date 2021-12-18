@@ -1,7 +1,7 @@
 ﻿Christie module
 ==========================
 
-A [Chataigne][] module maintained by [Théoriz studio][]
+A [Chataigne][] module maintained to control Christie projectors that don't support PJLink (GS serie for example, and you can add more if need to be !)
 
 Install
 -------
