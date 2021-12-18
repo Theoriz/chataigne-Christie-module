@@ -3,7 +3,7 @@
 	"type":"TCP Client",
 	"path":"Hardware",
 	
-	"version":"0.0.2",
+	"version":"1.0.0",
 	"description":"Control Christie projectors",
 	"url":"https://github.com/Theoriz/Christie-chataigne-module",
 	"downloadURL":"https://github.com/Theoriz/Christie-chataigne-module/archive/master.zip",
@@ -13,14 +13,6 @@
 
 	"parameters":
 	{
-		"Serie":
-		{
-			"type":"Enum",
-			"options":
-			{
-				"dummy":"dummyToRemoveWarning"
-			},
-		},
 	},
 
 	"defaults":
@@ -44,9 +36,10 @@
 
 	"commands":
 	{
-		"Power on":"power on",
-		"Power off":"power off",
-		"Shutter on/off":"shutter on_off",
+		"Power on":{"callback":"handlePowerOn"},
+		"Power off":{"callback":"handlePowerOff"},
+		"Shutter Toggle":{"callback":"handleShutterToggle"}
+
 	},
 
 }

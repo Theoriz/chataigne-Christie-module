@@ -11,30 +11,35 @@
 var poweroffRequested = false;
 var updateRate = 2; // 2 Hz
 
+var controlsContainer;
+var powerOn;
+var powerOff;
+var shutterToggle;
+
+var serie;
+
 function init()
 {
+
 	local.parameters.pass_through.setCollapsed(true);
 	local.scripts.setCollapsed(true);
 	script.setUpdateRate(updateRate);
-	//local.values.removeParameter("dummy");
+
+	serie = local.parameters.serie;
+	if(!serie) serie = local.parameters.addEnumParameter("Serie","The Christie Serie to use");
 	
+	serie.removeOptions();
+	serie.addOption("GS","gs");
+	serie.addOption("Template","template");
 	// TUTO : Add your serie here
-	local.parameters.serie.removeOptions();
-	local.parameters.serie.addOption("GS","gs");
-	local.parameters.serie.addOption("Template","unknown");
 
-	// Init
-	local.parameters.serie.set("GS");
-	loadGsSerieInterface();
-
-	local.values.removeParameter("dummy");
+	rebuildControls();
 }
 
 function moduleCommandChanged(command)
 {
-	script.log("command changed");
+	//script.log("command changed");
 }
-
 
 function moduleParameterChanged(param)
 {
@@ -43,24 +48,16 @@ function moduleParameterChanged(param)
 	{ 
 		//script.log("Module parameter changed : "+param.name+" > "+param.get());
 
-		if(param.name == "serie")
+		if(param.is(serie))
 		{
-			// clean values
-
-			// TUTO : Add your custom interface here
-			if(param.get() == "gs")
-			{
-				loadGsSerieInterface();
-			} else
-			{
-				script.log("No specific interface to load for " + param.get() + " ");
-			}			
-
+			rebuildControls();						
 		} else 
 		{
 			script.log("Module parameter triggered : " + param.name);	
 		}
-	}
+	}else if(param.is(powerOn)) handlePowerOn();
+		else if (param.is(powerOff)) handlePowerOff();
+		else if (param.is(shutterToggle)) handleShutterToggle();		
 
 }
 
@@ -77,53 +74,76 @@ function update(deltaTime)
 
 function moduleValueChanged(value)
 {
-	// TUTO : Add your commands here
-	if(local.parameters.serie.get() == "gs")
-	{
-		if(value.name == "powerOn")
-		{
-			gs_powerOn();
-
-		} else if (value.name == "powerOff")
-		{
-			gs_powerOff();
-
-		} else if (value.name == "shutterOn_off")
-		{
-			gs_shutterOn_off();
-		}
 		
-	} else {
-
-		script.log("Serie " + local.parameters.serie.get() + " is not supported yet");
-	} 
 }
 
-function loadGsSerieInterface()
+function rebuildControls()
 {
-	script.log("Loading GS serie interface...");
-	var powerOn = local.values.addTrigger("Power on", "Power GS serie on");
-	var powerOff = local.values.addTrigger("Power off", "Power GS serie off");
-	var shutterToggle = local.values.addTrigger("Shutter on/off", "Toggle GS serie shutter");
+	local.parameters.removeContainer(controlsContainer.name);
+	controlsContainer = null;
+
+	var s = serie.get();
+	
+	// TUDO : Add your serie and parameters here
+
+	if(s == "gs")
+	{
+		script.log("Loading GS serie interface...");
+		controlsContainer = local.parameters.addContainer("Controls");
+		powerOn = controlsContainer.addTrigger("Power on", "Power GS serie on");
+		powerOff = controlsContainer.addTrigger("Power off", "Power GS serie off");
+		shutterToggle = controlsContainer.addTrigger("Shutter on/off", "Toggle GS serie shutter");	
+	} else if( s == "template")
+	{
+		script.log("Loading Template serie interface...");
+		controlsContainer = local.parameters.addContainer("Controls");
+		powerOn = controlsContainer.addTrigger("Power on", "Power Template serie on");
+		powerOff = controlsContainer.addTrigger("Power off", "Power Template serie off");
+	}  else
+	{
+		script.log("No specific interface to load for " + param.get() + " ");
+	}
+
 }
 
-// Add your functions here
+// Callbacks
 
-function gs_powerOn()
+function handlePowerOn()
 {
-	local.send("(KEY 57)\n");
-	script.log("Power on sent (KEY 57)");
+	var s = serie.get();
+	if(s == "gs")
+	{
+		local.send("(KEY 57)\n");
+		script.log("Power on sent (KEY 57)");
+	} else if( s == "template")
+	{
+		script.log("Power on !");
+	}
 }
 
-function gs_powerOff()
+function handlePowerOff()
 {
-	local.send("(KEY 58)\n");
-	poweroffRequested = true;
-	script.log("First Power off sent : (KEY 58)");
+	var s = serie.get();
+	if(s == "gs")
+	{
+		local.send("(KEY 58)\n");
+		poweroffRequested = true;
+		script.log("First Power off sent : (KEY 58)");
+	} else if( s == "template")
+	{
+		script.log("Power off !");
+	}
 }
 
-function gs_shutterOn_off()
+function handleShutterToggle()
 {
-	local.send("(KEY 2)\n");
-	script.log("Shutter on/off sent : (KEY 2)");
+	var s = serie.get();
+	if(s == "gs")
+	{
+		local.send("(KEY 2)\n");
+		script.log("Shutter on/off sent : (KEY 2)");
+	} else if( s == "template")
+	{
+		script.log("Shutter toggle !");
+	}
 }
